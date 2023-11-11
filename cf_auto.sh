@@ -117,7 +117,7 @@ else
 		echo "为保证连接正常 将在3秒后开始更新";
 		sleep 3s;
 fi
-#开始循环
+开始循环
 echo "正在更新，请稍后...";
     #获取优选后的ip地址
     ipAddr=$(sed -n "$((x + 2)),1p" result.csv | awk -F, '{print $1}');
@@ -131,12 +131,12 @@ echo "已重启$CLIEN";
 echo "正在更新DNSPOD，请稍后...";
 
 clear
-curl https://dnsapi.cn/Record.Modify -d "login_token=$login_token&format=json&domain_id=$domain_id&record_id=$record_id&record_type=A&record_line=默认&sub_domain=$sub_domain&value=$ipAddr"
+curl https://dnsapi.cn/Record.Modify -d "login_token=$login_token&format=json&domain_id=$domain_id&record_id=$record_id&record_type=A&record_line=默认&sub_domain=$sub_domain&value=$ipAddr" >/dev/null
     sleep 3s;
 	
 clear
 #curl -s -X POST https://api.telegram.org/bot912320458:AAH_mSzRYfy13eDxvWsRwurA9p2x30EzhrU/sendMessage -d chat_id=-4093558163  -d parse_mode='HTML' -d text="EDtunnel优选为$ipAddr"
-curl -s -X POST https://api.telegram.org/bot${telegramBotToken}/sendMessage -d chat_id=${telegramBotUserId}  -d parse_mode='HTML' -d text="EDtunnel优选为$ipAddr"
+curl -s -X POST https://api.telegram.org/bot${telegramBotToken}/sendMessage -d chat_id=${telegramBotUserId}  -d parse_mode='HTML' -d text="EDtunnel优选为$ipAddr" >/dev/null
 
 clear
 
