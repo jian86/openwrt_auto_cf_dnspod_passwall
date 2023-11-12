@@ -16,6 +16,8 @@ pause=true
 #填写openwrt使用的是哪个科学上网客户端，填写对应的“数字”  默认为 1  客户端为passwall
 # 1=passwall 2=passwall2 3=ShadowSocksR Plus+ 4=clash 5=openclash 6=bypass
 clien=1
+#定义passwall节点名称
+passwallnode=Zu7EWzqN
 ###################################################################################################
 ##CloudflareST配置
 #测速地址  
@@ -117,15 +119,15 @@ else
 		echo "为保证连接正常 将在3秒后开始更新";
 		sleep 3s;
 fi
-开始循环
+
 echo "正在更新，请稍后...";
     #获取优选后的ip地址
     ipAddr=$(sed -n "$((x + 2)),1p" result.csv | awk -F, '{print $1}');
     echo "开始更新第$((x + 1))个---$ipAddr";
     #开始更新
-uci set passwall.Zu7EWzqN.address=$ipAddr
+uci set passwall.${passwallnode}.address=$ipAddr
 uci commit passwall
-uci show passwall.Zu7EWzqN.address
+uci show passwall.${passwallnode}.address
 		/etc/init.d/$CLIEN restart;
 echo "已重启$CLIEN";
 echo "正在更新DNSPOD，请稍后...";
