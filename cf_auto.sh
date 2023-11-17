@@ -132,12 +132,14 @@ uci show passwall.${passwallnode}.address
 echo "已重启$CLIEN";
 echo "正在更新DNSPOD，请稍后...";
 
-curl -s -X https://dnsapi.cn/Record.Modify -d "login_token=$login_token&format=json&domain_id=$domain_id&record_id=$record_id&record_type=A&record_line=默认&sub_domain=$sub_domain&value=$ipAddr" >/dev/null
+curl -s -X POST https://dnsapi.cn/Record.Modify -d "login_token=$login_token&format=json&domain_id=$domain_id&record_id=$record_id&record_type=A&record_line=默认&sub_domain=$sub_domain&value=$ipAddr" >/dev/null
     sleep 3s;
+ip_addr_dns=`curl https://dnsapi.cn/Record.Info -d "login_token=${login_token}&format=json&domain_id=${domain_id}&record_id=${record_id}&remark="|awk -F '"value"' '{print $2}'|awk -F "\"" '{print $2}'`
 
 #curl -s -X POST https://api.telegram.org/bot912320458:AAH_mSzRYfy13eDxvWsRwurA9p2x30EzhrU/sendMessage -d chat_id=-4093558163  -d parse_mode='HTML' -d text="EDtunnel优选为$ipAddr"
-curl -s -X POST https://api.telegram.org/bot${telegramBotToken}/sendMessage -d chat_id=${telegramBotUserId}  -d parse_mode='HTML' -d text="EDtunnel优选为$ipAddr" >/dev/null
+curl -s -X POST https://api.telegram.org/bot${telegramBotToken}/sendMessage -d chat_id=${telegramBotUserId}  -d parse_mode='HTML' -d text="EDtunnel优选为$ipAddr、DNSpod_IP设置为$ip_addr_dns" >/dev/null
 
 #passip=$(uci show passwall.${passwallnode}.address)
 echo 优选IP设置为$ipAddr
+echo DNSpod_IP设置为$ip_addr_dns
 exit ;
