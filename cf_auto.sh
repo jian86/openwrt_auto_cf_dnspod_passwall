@@ -1,4 +1,5 @@
 #!/bin/bash
+patch=/root/youxuan/
 #####################################################################################################
 ##TG推送设置
 #（填写即为开启推送，未填写则为不开启）
@@ -37,7 +38,7 @@ start=`date +%s`
 current_time=$(date "+%Y-%m-%d %H:%M:%S")
 echo "开始时间$current_time"
 echo "开始优选IPv4"
-./CloudflareST -url $CFST_URL -tl 200 -tll 40 -sl 5
+$patch/CloudflareST -url $CFST_URL -tl 200 -tll 40 -sl 5 -f $patch/ip.txt
 echo "测速完毕"
 echo "正在更新，请稍后..."
 echo "获取优选后的ip地址"
@@ -62,20 +63,21 @@ uci commit passwall
 echo "EDtunnel域名优选IP设置为$ip_addr_dns"
 echo "3秒后继续"
 sleep 3s;
-
+#####################################################################################################
 #定义passwall节点设置IP
 ip=$(uci show passwall.${passwallnode}.address)
 substring=${ip:26}
 echo "passwall节点IP设置为$substring"
-
 end=`date +%s.%N`
 runtime=$(echo "$end - $start" | bc -l)
 #停止时间
 shutdown_time=$(date "+%Y-%m-%d %H:%M:%S")
+#####################################################################################################
 #开始通知
 message="EDtunnel优选通知：%0A开始时间$current_time%0AEDtunnel域名优选为'$ip_addr_dns'%0Apasswall节点设置为$substring%0A结束时间$shutdown_time%0A执行时长$runtime秒"
 curl -s -X POST https://api.telegram.org/bot${telegramBotToken}/sendMessage -d chat_id=${telegramBotUserId}  -d parse_mode='HTML' -d text="$message"
-
+#####################################################################################################
 echo "结束时间$shutdown_time"
 echo "执行时长$runtime秒"
+#####################################################################################################
 exit ;
