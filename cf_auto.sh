@@ -42,6 +42,9 @@ CFST_p=20
 #IP段数据文件；如路径含有空格请加上引号；支持其他 CDN IP段；(默认 ip.txt)
 CFST_f=ip.txt
 #####################################################################################################
+#解压缩文件获取的特定文件名
+txtfile=45102-1-2096.txt
+#####################################################################################################
 start=`date +%s`
 #####################################################################################################
 #passwall
@@ -55,17 +58,20 @@ echo "开始时间$current_time"
 echo "开始优选IPv4"
 #####################################################################################################
 echo "正在下载最新IP段，请稍后..."
-# 下载压缩文件
+# 下载压缩文件 
 wget -qO txt.zip https://zip.baipiao.eu.org
 echo "正在解压缩最新IP段，请稍后..."
 # 解压缩文件并获取特定文件名
-file=$(unzip -l txt.zip | grep '31898-.*-443.txt' | awk '{print $4}')
+file=$(unzip -l txt.zip | grep ${txtfile} | awk '{print $4}')
 # 解压缩特定文件
-unzip -p txt.zip "$file" > ip.txt
+unzip -p txt.zip "$file" > $CFST_f
 # 删除临时文件
 rm txt.zip
 echo "最新IP段，获取完成..."
-sleep 3s;
+# sleep 3s;
+#####################################################################################################
+#####################################################################################################
+#####################################################################################################
 #####################################################################################################
 #开始测速
 $patch/CloudflareST -url $CFST_URL -tp $CFST_port -tl $CFST_tl -tll $CFST_tll -sl $CFST_sl -dn $CFST_dn -p $CFST_p -f $patch$CFST_f
@@ -76,13 +82,40 @@ ipAddr=$(sed -n "$((x + 2)),1p" result.csv | awk -F, '{print $1}')
 speedtest=$(sed -n "$((x + 2)),1p" result.csv | awk -F, '{print $6}')
 speedping=$(sed -n "$((x + 2)),1p" result.csv | awk -F, '{print $5}')
 speedloss=$(sed -n "$((x + 2)),1p" result.csv | awk -F, '{print $4}')
-echo "开始更新第$((x + 1))个---$ipAddr"
+#####################################################################################################
+#####################################################################################################
+#####################################################################################################
+#####################################################################################################
+#####################################################################################################
+while true; do
+    # 使用curl获取IP地址信息
+    json=$(curl -s http://ip-api.com/json/$ipAddr?lang=zh-CN)
+    
+    # 检查json是否为空
+    if [ -z "$json" ]; then
+    #    echo "JSON为空，继续循环"
+        continue
+    fi
+
+    # 提取国家信息
+    country=$(echo "$json" | jq -r '.country')
+
+    # 如果成功提取国家信息，跳出循环
+    if [ ! -z "$country" ]; then
+        break
+    fi
+done
+
+#####################################################################################################
+
+echo "优选的IP为$ipAddr丢包率$speedloss(%)平均延迟$speedping(ms)下载速度$speedtest(MB/s)IP区域为$country"
 #####################################################################################################
 #开始更新
-curl -s -X POST https://dnsapi.cn/Record.Modify -d "login_token=$login_token&format=json&domain_id=$domain_id&record_id=$record_id&record_type=A&record_line=默认&sub_domain=$sub_domain&value=$ipAddr";
+echo 更新EDtunnel域名地址为$ipAddr
+curl -s -X POST https://dnsapi.cn/Record.Modify -d "login_token=$login_token&format=json&domain_id=$domain_id&record_id=$record_id&record_type=A&record_line=默认&sub_domain=$sub_domain&value=$ipAddr" >/dev/null
 sleep 3s;
-ip_addr_dns=`curl https://dnsapi.cn/Record.Info -d "login_token=${login_token}&format=json&domain_id=${domain_id}&record_id=${record_id}&remark="|awk -F '"value"' '{print $2}'|awk -F "\"" '{print $2}'`;
-echo "3秒后继续"
+ip_addr_dns=`curl -s https://dnsapi.cn/Record.Info -d "login_token=${login_token}&format=json&domain_id=${domain_id}&record_id=${record_id}&remark="|awk -F '"value"' '{print $2}'|awk -F "\"" '{print $2}'`; >/dev/null
+echo 验证EDtunnel域名地址为$ip_addr_dns
 sleep 3s;
 #####################################################################################################
 #开始重启
@@ -93,23 +126,24 @@ uci set passwall.${passwallnode}.address=$ipAddr
 uci commit passwall
 
 #####################################################################################################
-echo "EDtunnel域名优选IP设置为$ip_addr_dns"
-echo "3秒后继续"
+echo "EDtunnel域名IP设置为$ip_addr_dns"
 sleep 3s;
 #####################################################################################################
 #定义passwall节点设置IP
 ip=$(uci show passwall.${passwallnode}.address)
 substring=${ip:26}
-echo "passwall节点IP设置为$substring"
+echo "PassWall节点IP设置为$substring"
 #####################################################################################################
+#执行时长
 end=`date +%s.%N`
 runtime=$(echo "$end - $start" | bc -l)
 #停止时间
 shutdown_time=$(date "+%Y-%m-%d %H:%M:%S")
 #####################################################################################################
+
 #开始通知
-message="EDtunnel优选通知：%0A开始时间$current_time%0AEDtunnel域名优选为'$ip_addr_dns'%0Apasswall节点设置为$substring%0A丢包率$speedloss(%)%0A平均延迟$speedping(ms)%0A下载速度$speedtest(MB/s)%0A结束时间$shutdown_time%0A执行时长$runtime秒"
-curl -s -X POST https://api.telegram.org/bot${telegramBotToken}/sendMessage -d chat_id=${telegramBotUserId}  -d parse_mode='HTML' -d text="$message"
+message="EDtunnel优选通知：%0A开始时间$current_time%0AEDtunnel域名设置为'$ip_addr_dns'%0APassWall节点设置为$substring%0A丢包率$speedloss(%)%0A平均延迟$speedping(ms)%0A下载速度$speedtest(MB/s)%0AIP区域为$country%0A结束时间$shutdown_time%0A执行时长$runtime秒"
+curl -s -X POST https://api.telegram.org/bot${telegramBotToken}/sendMessage -d chat_id=${telegramBotUserId}  -d parse_mode='HTML' -d text="$message" >/dev/null
 #####################################################################################################
 echo "结束时间$shutdown_time"
 echo "执行时长$runtime秒"
