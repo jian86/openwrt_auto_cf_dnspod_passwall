@@ -7,6 +7,13 @@ telegramBotToken=912320458:AAH_mSzRYfy13eDxvWsRwurA9p2x30EzhrU
 #用户ID或频道、群ID 例如：123456789
 telegramBotUserId=-4093558163
 #####################################################################################################
+#企业微信推送设置
+# 替换 YOUR_WEBHOOK_URL 为机器人的实际 Webhook 地址
+WEBHOOK_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=27bb7c6c-d745-4d62-bfa6-a6a968f9822b"
+#####################################################################################################
+
+
+
 #dnspod
 #生成的loginToken填入此处
 login_token="453642,3a5318cb800b2e06e40c64695c42e63c"
@@ -57,14 +64,14 @@ echo "开始时间$current_time"
 echo "开始优选IPv4"
 #####################################################################################################
 echo "正在下载最新IP段，请稍后..."
-# 下载压缩文件 
+#下载压缩文件 
 wget -qO txt.zip https://zip.baipiao.eu.org
 echo "正在解压缩最新IP段，请稍后..."
-# 解压缩文件并获取特定文件名
+#解压缩文件并获取特定文件名
 file=$(unzip -l txt.zip | grep ${txtfile} | awk '{print $4}')
-# 解压缩特定文件
+#解压缩特定文件
 unzip -p txt.zip "$file" > $CFST_f
-# 删除临时文件
+#删除临时文件
 rm txt.zip
 echo "最新IP段，获取完成..."
 # sleep 3s;
@@ -139,9 +146,16 @@ runtime=$(echo "$end - $start" | bc -l)
 #停止时间
 shutdown_time=$(date "+%Y-%m-%d %H:%M:%S")
 #####################################################################################################
-
 #开始通知
+#####################################################################################################
+#企业微信构建消息内容，包含变量
+MESSAGE_CONTENT="{\"msgtype\": \"text\", \"text\": {\"content\": \"EDtunnel优选通知：\n开始时间$current_time\nEDtunnel域名设置为'$ip_addr_dns'\nPassWall节点设置为$substring\n丢包率$speedloss(%)\n平均延迟$speedping(ms)\n下载速度$speedtest(MB/s)\nIP区域为$country\n结束时间$shutdown_time\n执行时长$runtime秒\"}}"
+#企业微信发送消息
+curl -s -H "Content-Type: application/json" -X POST -d "$MESSAGE_CONTENT" $WEBHOOK_URL >/dev/null
+#####################################################################################################
+#TG构建消息内容，包含变量
 message="EDtunnel优选通知：%0A开始时间$current_time%0AEDtunnel域名设置为'$ip_addr_dns'%0APassWall节点设置为$substring%0A丢包率$speedloss(%)%0A平均延迟$speedping(ms)%0A下载速度$speedtest(MB/s)%0AIP区域为$country%0A结束时间$shutdown_time%0A执行时长$runtime秒"
+#TG发送消息
 curl -s -X POST https://api.telegram.org/bot${telegramBotToken}/sendMessage -d chat_id=${telegramBotUserId}  -d parse_mode='HTML' -d text="$message" >/dev/null
 #####################################################################################################
 echo "结束时间$shutdown_time"
