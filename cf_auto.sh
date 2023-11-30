@@ -8,12 +8,9 @@ telegramBotToken=912320458:AAH_mSzRYfy13eDxvWsRwurA9p2x30EzhrU
 telegramBotUserId=-4093558163
 #####################################################################################################
 #企业微信推送设置
-# 替换 YOUR_WEBHOOK_URL 为机器人的实际 Webhook 地址
+#机器人的实际 Webhook 地址
 WEBHOOK_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=27bb7c6c-d745-4d62-bfa6-a6a968f9822b"
 #####################################################################################################
-
-
-
 #dnspod
 #生成的loginToken填入此处
 login_token="453642,3a5318cb800b2e06e40c64695c42e63c"
