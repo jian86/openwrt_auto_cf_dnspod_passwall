@@ -4,17 +4,17 @@ patch=/root/youxuan/
 ##TG推送设置
 #（填写即为开启推送，未填写则为不开启）
 #TG机器人token 例如：123456789:ABCDEFG...
-telegramBotToken=912320458:AAH_mSzRYfy13eDxvWsRwurA9p2x30EzhrU
+telegramBotToken=123456789:ABCDEFG
 #用户ID或频道、群ID 例如：123456789
-telegramBotUserId=-4093558163
+telegramBotUserId=123456789
 #####################################################################################################
 #dnspod
 #生成的loginToken填入此处
-login_token="453642,3a5318cb800b2e06e40c64695c42e63c"
+login_token="123456,123456"
 #将查询的domain_id填入此处
-domain_id="27487406"
+domain_id="123456"
 #将查询的记录id填入此处
-record_id="1651950487"
+record_id="123456"
 # 解析类型，A为ipv4,AAAA为ipv6
 record_type="A"
 #将查询的对应的解析记录的前缀填入此处
