@@ -101,7 +101,7 @@ fi
 #####################################################################################################
 #####################################################################################################
 #开始测速
-#$DATA_DIR/CloudflareST -url $CFST_URL -tp $CFST_port -tl $CFST_tl -tll $CFST_tll -sl $CFST_sl -dn $CFST_dn -p $CFST_p -f $DATA_DIR$CFST_f -o $DATA_DIR$CFST_o
+$DATA_DIR/CloudflareST -url $CFST_URL -tp $CFST_port -tl $CFST_tl -tll $CFST_tll -sl $CFST_sl -dn $CFST_dn -p $CFST_p -f $DATA_DIR$CFST_f -o $DATA_DIR$CFST_o
 echo "测速完毕"
 echo "正在更新，请稍后..."
 echo "获取优选后的ip地址"
