@@ -1,5 +1,6 @@
 #!/bin/bash
-patch=/root/youxuan/
+#工作路径
+DATA_DIR=/root/youxuan/
 #####################################################################################################
 #TG推送设置
 #TG机器人token 例如：123456789:ABCDEFG...
@@ -8,10 +9,10 @@ telegramBotToken=912320458:AAH_mSzRYfy13eDxvWsRwurA9p2x30EzhrU
 telegramBotUserId=-4093558163
 #####################################################################################################
 #企业微信推送设置
-#机器人的实际 Webhook 地址
+# 替换 YOUR_WEBHOOK_URL 为机器人的实际 Webhook 地址
 WEBHOOK_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=27bb7c6c-d745-4d62-bfa6-a6a968f9822b"
 #####################################################################################################
-#dnspod
+#dnspod配置
 #生成的loginToken填入此处
 login_token="453642,3a5318cb800b2e06e40c64695c42e63c"
 #将查询的domain_id填入此处
@@ -44,47 +45,68 @@ CFST_dn=20
 CFST_p=20
 #IP段数据文件；如路径含有空格请加上引号；支持其他 CDN IP段；(默认 ip.txt)
 CFST_f=ip.txt
+#写入结果文件；如路径含有空格请加上引号；值为空时不写入文件 [-o ""]；(默认 result.csv)
+CFST_o=result.csv
 #####################################################################################################
 #解压缩文件获取的特定文件名
 txtfile=45102-1-2096.txt
 #####################################################################################################
+#IP段数据文件下载最大重试次数
+max_retries=5
+retries=0
+#####################################################################################################
 start=`date +%s`
 #####################################################################################################
-#passwall
-# echo "开始停止$CLIEN";
-	# /etc/init.d/$CLIEN stop;
-# echo "已停止$CLIEN";
+#passwall服务停止
+echo "开始停止$CLIEN";
+	/etc/init.d/$CLIEN stop;
+echo "已停止$CLIEN";
 #####################################################################################################
 #优选开始
 current_time=$(date "+%Y-%m-%d %H:%M:%S")
 echo "开始时间$current_time"
 echo "开始优选IPv4"
 #####################################################################################################
-echo "正在下载最新IP段，请稍后..."
-#下载压缩文件 
-wget -qO txt.zip https://zip.baipiao.eu.org
-echo "正在解压缩最新IP段，请稍后..."
-#解压缩文件并获取特定文件名
-file=$(unzip -l txt.zip | grep ${txtfile} | awk '{print $4}')
-#解压缩特定文件
-unzip -p txt.zip "$file" > $CFST_f
-#删除临时文件
-rm txt.zip
-echo "最新IP段，获取完成..."
+while [ $retries -lt $max_retries ]; do
+    retries=$((retries + 1))
+    echo "正在进行第 $retries 次尝试下载最新IP段，请稍后..."
+    # 下载压缩文件
+    wget -qO "${DATA_DIR}txt.zip" "https://zip.baipiao.eu.org"
+    
+    if [ $? -eq 0 ]; then
+        echo "正在解压缩最新IP段，请稍后..."
+        # 解压缩文件并获取特定文件名
+        file=$(unzip -l "${DATA_DIR}txt.zip" | grep "${txtfile}" | awk '{print $4}')
+        
+        # 解压缩特定文件
+        unzip -p "${DATA_DIR}txt.zip" "$file" > "${DATA_DIR}$CFST_f"
+        
+        # 删除临时文件
+        rm "${DATA_DIR}txt.zip"
+        echo "最新IP段，获取完成..."
+        break  # 如果成功获取文件，则跳出循环
+    else
+        echo "下载失败，正在尝试重新下载..."
+    fi
+done
+
+if [ $retries -eq $max_retries ]; then
+    echo "已达到最大重试次数，无法获取文件。"
+fi
 # sleep 3s;
 #####################################################################################################
 #####################################################################################################
 #####################################################################################################
 #####################################################################################################
 #开始测速
-$patch/CloudflareST -url $CFST_URL -tp $CFST_port -tl $CFST_tl -tll $CFST_tll -sl $CFST_sl -dn $CFST_dn -p $CFST_p -f $patch$CFST_f
+$DATA_DIR/CloudflareST -url $CFST_URL -tp $CFST_port -tl $CFST_tl -tll $CFST_tll -sl $CFST_sl -dn $CFST_dn -p $CFST_p -f $DATA_DIR$CFST_f -o $DATA_DIR$CFST_o
 echo "测速完毕"
 echo "正在更新，请稍后..."
 echo "获取优选后的ip地址"
-ipAddr=$(sed -n "$((x + 2)),1p" result.csv | awk -F, '{print $1}')
-speedtest=$(sed -n "$((x + 2)),1p" result.csv | awk -F, '{print $6}')
-speedping=$(sed -n "$((x + 2)),1p" result.csv | awk -F, '{print $5}')
-speedloss=$(sed -n "$((x + 2)),1p" result.csv | awk -F, '{print $4}')
+ipAddr=$(sed -n "$((x + 2)),1p" ${DATA_DIR}result.csv | awk -F, '{print $1}')
+speedtest=$(sed -n "$((x + 2)),1p" ${DATA_DIR}result.csv | awk -F, '{print $6}')
+speedping=$(sed -n "$((x + 2)),1p" ${DATA_DIR}result.csv | awk -F, '{print $5}')
+speedloss=$(sed -n "$((x + 2)),1p" ${DATA_DIR}result.csv | awk -F, '{print $4}')
 #####################################################################################################
 #####################################################################################################
 #####################################################################################################
@@ -122,8 +144,9 @@ echo 验证EDtunnel域名地址为$ip_addr_dns
 sleep 3s;
 #####################################################################################################
 #开始重启
-# /etc/init.d/$CLIEN restart;
-# echo "已重启$CLIEN";
+/etc/init.d/$CLIEN restart;
+echo "已重启$CLIEN";
+sleep 3s;
 # #开始更新
 uci set passwall.${passwallnode}.address=$ipAddr
 uci commit passwall
