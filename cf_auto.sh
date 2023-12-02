@@ -13,17 +13,15 @@ telegramBotUserId=-4093558163
 #替换 YOUR_WEBHOOK_URL 为机器人的实际 Webhook 地址
 WEBHOOK_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=27bb7c6c-d745-4d62-bfa6-a6a968f9822b"
 #####################################################################################################
-#dnspod配置
+#DnsPod域名更新配置
 #生成的loginToken填入此处
 login_token="453642,3a5318cb800b2e06e40c64695c42e63c"
-#将查询的domain_id填入此处
-domain_id="27487406"
-#将查询的记录id填入此处
-record_id="1651950487"
-# 解析类型，A为ipv4,AAAA为ipv6
-record_type="A"
-#将查询的对应的解析记录的前缀填入此处
+#域名
+domain="vyos.com.cn"
+#子域名，如果是主域名，将其设置为 "@"
 sub_domain="edtunnel"
+#解析类型，A为ipv4,AAAA为ipv6
+record_type="A"
 #####################################################################################################
 #定义passwall节点名称
 passwallnode=pY9G8QeR
@@ -101,7 +99,7 @@ fi
 #####################################################################################################
 #####################################################################################################
 #开始测速
-$DATA_DIR/CloudflareST -url $CFST_URL -tp $CFST_port -tl $CFST_tl -tll $CFST_tll -sl $CFST_sl -dn $CFST_dn -p $CFST_p -f $DATA_DIR$CFST_f -o $DATA_DIR$CFST_o
+#$DATA_DIR/CloudflareST -url $CFST_URL -tp $CFST_port -tl $CFST_tl -tll $CFST_tll -sl $CFST_sl -dn $CFST_dn -p $CFST_p -f $DATA_DIR$CFST_f -o $DATA_DIR$CFST_o
 echo "测速完毕"
 echo "正在更新，请稍后..."
 echo "获取优选后的ip地址"
@@ -140,28 +138,36 @@ echo "优选的IP为$ipAddr丢包率$speedloss(%)平均延迟$speedping(ms)下�
 #####################################################################################################
 #开始更新
 echo 更新EDtunnel域名地址为$ipAddr
+# 获取域名的 domain_id
+domain_info=$(curl -s -X POST https://dnsapi.cn/Domain.Info -d "login_token=${login_token}&format=json&domain=${domain}")
+domain_id=$(echo "${domain_info}" | awk -F'"id"' '{print $2}' | awk -F'"' '{print $2}')
+
+# 获取子域名的 record_id
+record_info=$(curl -s -X POST https://dnsapi.cn/Record.List -d "login_token=${login_token}&format=json&domain_id=${domain_id}&sub_domain=${sub_domain}")
+record_id=$(echo "${record_info}" | awk -F'"records"' '{print $2}' | awk -F'"id"' '{print $2}' | awk -F'"' '{print $2}')
+
 curl -s -X POST https://dnsapi.cn/Record.Modify -d "login_token=$login_token&format=json&domain_id=$domain_id&record_id=$record_id&record_type=A&record_line=默认&sub_domain=$sub_domain&value=$ipAddr" >/dev/null
 sleep 3s;
 ip_addr_dns=`curl -s https://dnsapi.cn/Record.Info -d "login_token=${login_token}&format=json&domain_id=${domain_id}&record_id=${record_id}&remark="|awk -F '"value"' '{print $2}'|awk -F "\"" '{print $2}'`; >/dev/null
 echo 验证EDtunnel域名地址为$ip_addr_dns
-sleep 3s;
+#sleep 3s;
 #####################################################################################################
 #开始重启
 /etc/init.d/$CLIEN restart;
 echo "已重启$CLIEN";
 sleep 3s;
-# #开始更新
+# 开始更新
 uci set passwall.${passwallnode}.address=$ipAddr
 uci commit passwall
 
 #####################################################################################################
-echo "EDtunnel域名IP设置为$ip_addr_dns"
-sleep 3s;
+#echo "EDtunnel域名IP设置为$ip_addr_dns"
+#sleep 3s;
 #####################################################################################################
 #定义passwall节点设置IP
 ip=$(uci show passwall.${passwallnode}.address)
 substring=${ip:26}
-echo "PassWall节点IP设置为$substring"
+#echo "PassWall节点IP设置为$substring"
 #####################################################################################################
 #执行时长
 end=`date +%s.%N`
