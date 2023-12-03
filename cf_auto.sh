@@ -23,6 +23,7 @@ sub_domain="edtunnel"
 #解析类型，A为ipv4,AAAA为ipv6
 record_type="A"
 #####################################################################################################
+
 #定义passwall节点名称
 passwallnode=pY9G8QeR
 #定义passwall进程
@@ -56,15 +57,30 @@ retries=0
 #####################################################################################################
 start=`date +%s`
 #####################################################################################################
+current_time=$(date "+%Y-%m-%d %H:%M:%S")
+echo "开始时间$current_time"
+#####################################################################################################
+#开始通知
+#企业微信构建消息内容，包含变量
+MESSAGE_CONTENT_START="{\"msgtype\": \"text\", \"text\": {\"content\": \"EDtunnel优选通知：\n开始时间$current_time\"}}" >/dev/null
+#企业微信发送消息
+curl -s -H "Content-Type: application/json" -X POST -d "$MESSAGE_CONTENT_START" $WEBHOOK_URL >/dev/null
+#####################################################################################################
+#TG构建消息内容，包含变量
+message_start="EDtunnel优选开始：%0A开始时间$current_time"
+#TG发送消息
+curl -s -X POST https://api.telegram.org/bot${telegramBotToken}/sendMessage -d chat_id=${telegramBotUserId}  -d parse_mode='HTML' -d text="$message_start" >/dev/null
+#企业微信发送消息
+#####################################################################################################
 #passwall服务停止
 echo "开始停止$CLIEN";
 	/etc/init.d/$CLIEN stop;
 echo "已停止$CLIEN";
 #####################################################################################################
 #优选开始
-current_time=$(date "+%Y-%m-%d %H:%M:%S")
-echo "开始时间$current_time"
+
 echo "开始优选IPv4"
+
 #####################################################################################################
 #下载最新IP段
 while [ $retries -lt $max_retries ]; do
@@ -99,7 +115,7 @@ fi
 #####################################################################################################
 #####################################################################################################
 #开始测速
-#$DATA_DIR/CloudflareST -url $CFST_URL -tp $CFST_port -tl $CFST_tl -tll $CFST_tll -sl $CFST_sl -dn $CFST_dn -p $CFST_p -f $DATA_DIR$CFST_f -o $DATA_DIR$CFST_o
+$DATA_DIR/CloudflareST -url $CFST_URL -tp $CFST_port -tl $CFST_tl -tll $CFST_tll -sl $CFST_sl -dn $CFST_dn -p $CFST_p -f $DATA_DIR$CFST_f -o $DATA_DIR$CFST_o
 echo "测速完毕"
 echo "正在更新，请稍后..."
 echo "获取优选后的ip地址"
@@ -175,7 +191,7 @@ runtime=$(echo "$end - $start" | bc -l)
 #停止时间
 shutdown_time=$(date "+%Y-%m-%d %H:%M:%S")
 #####################################################################################################
-#开始通知
+#结束通知
 #####################################################################################################
 #企业微信构建消息内容，包含变量
 MESSAGE_CONTENT="{\"msgtype\": \"text\", \"text\": {\"content\": \"EDtunnel优选通知：\n开始时间$current_time\nEDtunnel域名设置为'$ip_addr_dns'\nPassWall节点设置为$substring\n丢包率$speedloss(%)\n平均延迟$speedping(ms)\n下载速度$speedtest(MB/s)\nIP区域为$country\n结束时间$shutdown_time\n执行时长$runtime秒\"}}"
