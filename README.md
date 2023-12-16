@@ -1,8 +1,11 @@
 自己瞎写的脚本，百度+谷歌鼓捣出来的能用就行，毕竟不是专业的。。。。。
+
 测试环境centos7，生产环境为openwrt23.05.2原版
+
 感谢https://t.me/cf_push
 
-每隔30分钟测试一下www.google.com能否访问，否则运行优选脚本，并更改passwall节点IP、dnspod托管域名IP为优选后的IP，并发送企业微信或者telegrambot通知
+每隔30分钟测试一下www.google.com能否访问，否则运行优选脚本，根据优选结果自动更改passwall节点IP、dnspod托管域名IP为优选后的IP，发送企业微信或者telegrambot通知
+
 默认为企业微信通知，如用telegram通知请修改74行和210行将#删除
 
 请安装jq、wget、curl、unzip
@@ -12,7 +15,7 @@
 txtfile=45102-1-2096.txt
 
 
-建立目录/root/youxuan，并把所有文件下载到这个目录里
+建立目录/root/youxuan，把所有文件下载到这个目录里
 mkdir /root/youxuan
 
 crontab-test.sh #加入计划任务30分钟执行一次
