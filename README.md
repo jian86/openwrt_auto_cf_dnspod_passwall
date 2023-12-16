@@ -2,6 +2,8 @@
 
 测试环境centos7，生产环境为openwrt23.05.2原版
 
+运行结果log在log.txt文件，请自行查看
+
 感谢https://t.me/cf_push
 
 每隔30分钟测试一下www.google.com能否访问，否则运行优选脚本，根据优选结果自动更改passwall节点IP、dnspod托管域名IP为优选后的IP，发送企业微信或者telegrambot通知
