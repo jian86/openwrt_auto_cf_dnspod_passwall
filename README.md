@@ -1,4 +1,5 @@
 自己瞎写的脚本，百度+谷歌鼓捣出来的能用就行，毕竟不是专业的。。。。。
+感谢https://t.me/cf_push
 每隔30分钟测试一下www.google.com能否访问，否则运行优选脚本，并更改passwall节点IP、dnspod托管域名IP为优选后的IP，并发送企业微信或者telegrambot通知
 默认为企业微信通知，如用telegram通知请修改74行和210行将#删除
 
