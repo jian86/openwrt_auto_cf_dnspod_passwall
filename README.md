@@ -61,3 +61,6 @@ passwallnode=kBPfeRx8
 
 CLIEN=passwall
 #####################################################################################################
+passwall打开http和socks5代理用于www.google.com检测
+![image](https://github.com/jian86/openwrt_auto_cf_dnspod_passwall/assets/59141844/3911654e-4806-4f4e-95e4-5fc3c91b1bd4)
+
