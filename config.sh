@@ -4,9 +4,9 @@ DATA_DIR=/root/youxuan/
 #####################################################################################################
 #TG推送设置
 #TG机器人token 例如：123456789:ABCDEFG...
-telegramBotToken=912320458:AAH_mSzRYfy13eDxvWsRwurA9p2x30EzhrU
+telegramBotToken=x:x
 #用户ID或频道、群ID 例如：123456789
-telegramBotUserId=-4093558163
+telegramBotUserId=x
 #####################################################################################################
 #企业微信推送设置
 #替换 YOUR_WEBHOOK_URL 为机器人的实际 Webhook 地址
@@ -14,11 +14,11 @@ WEBHOOK_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=27bb7c6c-d745-
 #####################################################################################################
 #DnsPod域名更新配置
 #生成的loginToken填入此处
-login_token="453642,3a5318cb800b2e06e40c64695c42e63c"
+login_token="x,x"
 #域名
-domain="vyos.com.cn"
+domain="x.com.cn"
 #子域名，如果是主域名，将其设置为 "@"
-sub_domain="edtunnel"
+sub_domain="x"
 #解析类型，A为ipv4,AAAA为ipv6
 record_type="A"
 #####################################################################################################
