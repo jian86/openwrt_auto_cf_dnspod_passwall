@@ -1,14 +1,5 @@
 #!/bin/bash
 source /root/youxuan/config.sh
-# # 设置测试用的代理服务器地址和端口
-# proxy_server="127.0.0.1:1081"
-# url_website="www.google.com"
-
-
-
-# 设置测试次数上限
-url_max_retries=10
-url_retry_count=0
 
 # 循环测试代理服务器是否能访问指定网站
 while [ $url_retry_count -lt $url_max_retries ]; do
@@ -30,4 +21,5 @@ done
 current_time3=$(date "+%Y-%m-%d %H:%M:%S")
 echo "#####################################################################################################"
 echo "$current_time3 连续 $url_max_retries 次无法访问 $url_website，执行Edtunnel脚本..."
+#运行edtunnel.sh脚本
 sh $DATA_DIR/edtunnel.sh
