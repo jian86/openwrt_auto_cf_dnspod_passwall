@@ -19,12 +19,13 @@ txtfile=45102-1-2096.txt
 
 建立目录/root/youxuan，把所有文件下载到这个目录里
 mkdir /root/youxuan
-
-crontab-test.sh #加入计划任务30分钟执行一次
- */30 * * * * sh /root/youxuan/crontab.sh >>/root/youxuan/log.txt
 别忘了+X权限
 
-修改/root/youxuan/edtunnel.sh
+start.sh #加入计划任务30分钟执行一次
+ */30 * * * * sh /root/youxuan/start.sh >>/root/youxuan/log.txt
+
+
+修改/root/youxuan/config.sh
 找到以下配置根据自己的修改
 
 #####################################################################################################
@@ -66,6 +67,8 @@ passwallnode=kBPfeRx8
 
 CLIEN=passwall
 #####################################################################################################
+
+
 passwall打开http和socks5代理用于www.google.com检测
 ![image](https://github.com/jian86/openwrt_auto_cf_dnspod_passwall/assets/59141844/3911654e-4806-4f4e-95e4-5fc3c91b1bd4)
 
