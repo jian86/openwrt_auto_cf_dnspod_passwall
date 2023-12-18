@@ -10,7 +10,7 @@ telegramBotUserId=x
 #####################################################################################################
 #企业微信推送设置
 #替换 YOUR_WEBHOOK_URL 为机器人的实际 Webhook 地址
-WEBHOOK_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=27bb7c6c-d745-4d62-bfa6-a6a968f9822b"
+WEBHOOK_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xx"
 #####################################################################################################
 #DnsPod域名更新配置
 #生成的loginToken填入此处
