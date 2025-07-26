@@ -12,9 +12,9 @@
 
 请安装jq、wget、curl、unzip
 
-自动下载"https://zip.baipiao.eu.org"的AS45102
+自动下载"http://zip.cm.edu.kg/"的SG.txt可以自定义
 
-txtfile=45102-1-2096.txt
+txtfile=SG.txt
 
 
 建立目录/root/youxuan，把所有文件下载到这个目录里
